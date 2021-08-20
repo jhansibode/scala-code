@@ -12,3 +12,30 @@ val firstrec = rdd5.first()
 val maxrec = rdd5.max()
 println("count:" +rdd5.count())
 rdd5.saveAsTextFile("/FileStore/tables/wordcount")
+************************************************************************************
+import org.apache.spark.sql.SparkSession
+val spark:SparkSession = SparkSession.builder().master("Local[1]").appName("sparkByExamples").getOrCreate()
+val data = Seq ("jahnsi bode",
+               "bode jhansi",
+               "Sravan Bode",
+               "Suma Bode" )
+val rdd = spark.sparkContext.parallelize(data)
+rdd.foreach(println)
+val rdd1 = rdd.flatMap(a=>a.split(" ")).collect()
+rdd1.foreach(println)
+
+**************************************************************************************
+import spark.implicits._
+//import org.apache.spark.sql.expressions.window
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
+val structdata = Seq(Row("jhansi", "bode" ,1600000 ,"nellore"),
+                    Row("sravani","bode",120000,"AP"),
+                    Row("suma","bode",140000,"Vijayawada"))
+
+val structSchema = new StructType()
+.add("firstname" ,StringType)
+.add("lastname",StringType)
+.add("sal",IntegerType)
+.add("place" ,StringType)
+val df2 = spark.createDataFrame(spark.sparkContext.parallelize(structdata),structSchema)
