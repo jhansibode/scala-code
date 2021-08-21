@@ -40,3 +40,70 @@ val structSchema = new StructType()
 .add("place" ,StringType)
 val df2 = spark.createDataFrame(spark.sparkContext.parallelize(structdata),structSchema)
 val df2 = df.flatMap(f=>f.getSeq[String](1).map((f.getString(0),_,f.getString(2)))).toDF("fullname","sal","place")
+
+
+*****************************************************************************************************************************
+
+import org.apache.spark.sql.SparkSession
+val spark:SparkSession = SparkSession.builder().master("Local[1]").appName("sparkByExamples").getOrCreate()
+val data = Seq ("jahnsi bode",
+               "bode jhansi",
+               "Sravan Bode",
+               "Suma Bode" )
+val rdd = spark.sparkContext.parallelize(data)
+rdd.foreach(println)
+val rdd1 = rdd.flatMap(a=>a.split(" "))
+rdd1.foreach(println)
+************************************************************************************************************************
+val listRdd = spark.sparkContext.parallelize(List(1,2,3,4,5,6,7))
+println("partiotns:" +listRdd.getNumPartitions)
+println("Total":+ listRdd.fold(0)((acc,ele) =>{acc+ele}))
+println("total with init Value 2:" + listRdd.fold(2)((acc,ele)=>{acc+ele}))
+println("Total":+ listRdd.fold(0)((acc,ele) =>{acc min ele}))
+
+****************************************************************************************************************
+val listRdd = spark.sparkContext.parallelize(List(1,2,3,4,5,6))
+def param0 = (accu:Int,v:Int)=>accu+v
+def param1 = (accu1:Int ,accu2:Int)=>accu1+accu2
+println("output 1:" +listRdd.aggregate(0)(param0,param1))
+
+******************************************************************************
+import org.apache.spark.sql.SparkSession
+val spark:SparkSession = SparkSession.builder().master("Local[3]").appName("sparkexamples.com").getOrCreate()
+import spark.implicits._
+val cloumns = Seq("language","user_count")
+val data = Seq(("java" ,20000),("scala" ,30000),("python",40000))
+val rdd = spark.sparkContext.parallelize(data)
+val df = rdd.toDF("lang","count")
+df.printSchema()
+******************************************************************************
+val df2 = spark.createDataFrame(rdd).toDF(cloumns:_*).show()
+*************************************************************************
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.SparkSession
+val schema = StructType(Array(StructField("language",StringType,true),
+                             StructField("language",StringType,true)))
+val rowRDD = rdd.map(a=>Row(a._1,a._2))
+val DF = spark.createDataFrame(rowRDD,schema)
+******************************************************************
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.types.{DoubleType,StringType,StructField,StructType}
+val spark:SparkSession = SparkSession.builder().master("Local[1]").appName("spark By Examples.com").getOrCreate()
+import spark.implicits._
+import org.apache.spark.sql.types._
+val schema = StructType(
+                       StructField("firstname", StringType,true)::
+                       StructField("secondname",IntegerType ,false)::Nil)
+val colSeq= Seq("firstname","secondname")
+case class Name(firstname:String ,secondname:String)
+
+val df = spark.emptyDataFrame
+val df1 = spark.createDataFrame(spark.sparkContext.emptyRDD[Row],schema)
+
+********************************************************************************************
+val df = spark.emptyDataFrame
+val df1 = spark.createDataFrame(spark.sparkContext.emptyRDD[Row],schema)
+Seq.empty[(String,String)].toDF(colSeq:_*)
+**********************************************************************************************
